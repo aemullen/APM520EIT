@@ -1,0 +1,6 @@
+% Test doc to see how github works
+x=[0:1:10];
+for i=1:1:10
+ x(i)=x(i)-i;
+end
+x
