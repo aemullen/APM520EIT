@@ -7,7 +7,10 @@
 % 6 - Find u1 using forward model
 % 7- Find r1 and so on
 
-function laplace1(N)
+
+
+
+function Forward(N)
 %laplace1(N) solves the 2D Laplace equation 
 %        u_xx + u_yy = 0 
 %    on the unit square with N dx by N dy, with dx = dy = h. 
@@ -26,7 +29,7 @@ u(N+1,k) = 1; % nonzero BC u(x=1,y) = 1
 % u(k,1) = 0.5; % nonzero BC u(x,y=0) = 0.5
 
 sum = 0;
-sigma = 0.5;
+sigma = 0.39;
 for i = 2:N
     for j = 2:N
         residual = -0.5*(8*sigma)*u(i,j)+sigma*(u(i+1,j)+u(i-1,j)+u(i,j+1)+u(i,j-1)); 
