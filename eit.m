@@ -1,40 +1,27 @@
-% 1- Add noise to boundary conditions
-% 2- Guess sigma zero (initial value for conductivity)
-% 3- Find u0 (voltage) using forward model
-% 4- Calculate r0 (residual) (ri = f(sigma i, ui) - yi )
-% 5- Using u0, update sigma:
-%         sigma 1 = sigma 0 + ((J'J)^-1) * J'  * r0
-% 6 - Find u1 using forward model
-% 7- Find r1 and so on
+%% APM 520 EIT
+% EIT group
 
 %% Inverse problem
+% Gauss Newton Method
 N = 3;
 u = zeros(N+1, N+1);
-% Boudary conditions
-k = (1:N*N)';
-n = normrnd(1,0.09,N+1,1);
-u(N+1,:) = normrnd(1,0.09,N+1,1); % nonzero BC 
-u(1,:) = normrnd(1,0.09,N+1,1);
-u(:,1) = normrnd(1,0.09,N+1,1); % nonzero BC 
+% step one: boudary conditions
+u(N+1,:) = normrnd(1,0.09,N+1,1);
+u(1,:)   = normrnd(1,0.09,N+1,1);
+u(:,1)   = normrnd(1,0.09,N+1,1);
 u(:,N+1) = normrnd(1,0.09,N+1,1);
-
-
-% Gauss Newton Method
-
-
+% step two: guess initial conductivity (sigma0)
 sigma = zeros(N*N, N*N);
-% step one: initial guess sigma 0
 for i= 1:N*N
     for j = 1:N*N
         sigma(i,j) = 1;
-        %u = Forward(N,sigma);
-        
     end
-     
 end
+% step three: find voltage (u0) by solving forward problem
 [u_sol, residual] = Forward(N,sigma,u);
-
+% step four: compute residual (r_i = f(sigma_i, u_i) - y_i)
 r0 = norm(u_sol - u);
+% step five: update sigma (sigma_i+1 = sigma_i + (J'J)^(-1)*J'*r_i)
 J = [u_sol(1), u_sol(2), 0, u_sol(4),0,0,0,0,0;
     u_sol(1), u_sol(2), u_sol(3), 0, u_sol(5), 0,0,0,0;
     0, u_sol(2), u_sol(3),0,0, u_sol(6), 0,0,0;
@@ -45,6 +32,9 @@ J = [u_sol(1), u_sol(2), 0, u_sol(4),0,0,0,0,0;
     0,0,0,0,u_sol(5),0,  u_sol(7), u_sol(8), u_sol(9);
     0, 0, 0, 0, 0, u_sol(6), 0, u_sol(8), u_sol(9)];
 sigma1 = sigma + (J'*J)^-1 *J'*r0;
+
+% plot
+k = (1:N*N)';
 x = (k-1)/N; y = (k-1)/N;
 figure(1)
 clf
@@ -60,25 +50,18 @@ function [u_s, residual] = Forward(N, sigma,u)
 %    BCs are Dirichlet with u = 0 on boundary except u(x=1,y) = 1.
 %    Uses Gauss-Seidel iteration.
 
-%tic
 h = 1/N; % dx = dy = h
 k = (1:N+1)';
 x = (k-1)/N;
 y = (k-1)/N;
-% u = zeros(N+1,N+1);
-% u(N+1,k) = 1; % nonzero BC 
-% u(1,k) = 1;
-% u(k,1) = 1; % nonzero BC 
-% u(k,N+1) = 1;
 
 sum = 0;
-%sigma = 0.39;
-% for i = 2:N
-%     for j = 2:N
-%         residual = sigma(i,j)*u(i,j)+sigma(i+1,j)*u(i+1,j)+sigma(i-1,j)*u(i-1,j)+sigma(i,j+1)*u(i,j+1)+sigma(i,j-1)*u(i,j-1); 
-%         sum = sum + abs(residual);
-%     end
-% end
+for i = 2:N
+    for j = 2:N
+        residual = sigma(i,j)*u(i,j)+sigma(i+1,j)*u(i+1,j)+sigma(i-1,j)*u(i-1,j)+sigma(i,j+1)*u(i,j+1)+sigma(i,j-1)*u(i,j-1); 
+        sum = sum + abs(residual);
+    end
+end
 normresidual = 0.5; % could divide by (N-1)^2 here and below in line 39
 EPSILON = 10^-5*h^2*normresidual;
 iter = 0;
@@ -94,27 +77,7 @@ while normresidual > EPSILON
     end
     normresidual = sum;
 end
-iterations = iter
+iterations = iter;
 
-%toc
-
-%u = u'; % transpose to plot
-u_s = u
-% figure
-% surf(x,y,u);
-% shading flat;
-% xlabel('x','FontSize',24); 
-% ylabel('y','FontSize',24); 
-% zlabel('Potential','FontSize',24);
-% 
-% figure
-% hh = pcolor(x,y,u);
-% set(hh,'edgecolor','none','facecolor','interp');
-% axis equal;
-% axis off;
-% set(gca,'fontsize',24);
-% title('Potential');
-% colormap jet;
-% colorbar;
-
+u_s = u;
 end
