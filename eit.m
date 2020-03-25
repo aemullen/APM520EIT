@@ -9,14 +9,14 @@
 
 %% Inverse problem
 N = 3;
-u = zeros(N, N);
+u = zeros(N+1, N+1);
 % Boudary conditions
-k = (1:N+1)';
+k = (1:N*N)';
 n = normrnd(1,0.09,N+1,1);
-u(N+1,k) = normrnd(1,0.09,N+1,1); % nonzero BC 
-u(1,k) = normrnd(1,0.09,N+1,1);
-u(k,1) = normrnd(1,0.09,N+1,1); % nonzero BC 
-u(k,N+1) = normrnd(1,0.09,N+1,1);
+u(N+1,:) = normrnd(1,0.09,N+1,1); % nonzero BC 
+u(1,:) = normrnd(1,0.09,N+1,1);
+u(:,1) = normrnd(1,0.09,N+1,1); % nonzero BC 
+u(:,N+1) = normrnd(1,0.09,N+1,1);
 
 
 % Gauss Newton Method
@@ -34,7 +34,7 @@ for i= 1:N*N
 end
 [u_sol, residual] = Forward(N,sigma,u);
 
-r0 = abs(u_sol - u);
+r0 = norm(u_sol - u);
 J = [u_sol(1), u_sol(2), 0, u_sol(4),0,0,0,0,0;
     u_sol(1), u_sol(2), u_sol(3), 0, u_sol(5), 0,0,0,0;
     0, u_sol(2), u_sol(3),0,0, u_sol(6), 0,0,0;
@@ -43,10 +43,12 @@ J = [u_sol(1), u_sol(2), 0, u_sol(4),0,0,0,0,0;
     0,0,u_sol(3), 0, u_sol(5), u_sol(6), 0,0,u_sol(9);
     0,0,0,u_sol(4), 0, 0, u_sol(7), u_sol(8), 0;
     0,0,0,0,u_sol(5),0,  u_sol(7), u_sol(8), u_sol(9);
-    0, 0, 0, 0, 0, u_sol(6), 0, u_sol(8), u_sol(9)]
-%sigma1 = sigma +
-
-
+    0, 0, 0, 0, 0, u_sol(6), 0, u_sol(8), u_sol(9)];
+sigma1 = sigma + (J'*J)^-1 *J'*r0;
+x = (k-1)/N; y = (k-1)/N;
+figure(1)
+clf
+surf(x,y,sigma1)
 
 %%
 function [u_s, residual] = Forward(N, sigma,u)
