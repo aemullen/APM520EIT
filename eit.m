@@ -8,8 +8,8 @@
 % 7- Find r1 and so on
 
 %% Inverse problem
-N = 50;
-u = zeros(N+1, N+1);
+N = 3;
+u = zeros(N, N);
 % Boudary conditions
 k = (1:N+1)';
 n = normrnd(1,0.09,N+1,1);
@@ -22,27 +22,34 @@ u(k,N+1) = normrnd(1,0.09,N+1,1);
 % Gauss Newton Method
 
 
-sigma = zeros(N+1, N+1);
+sigma = zeros(N*N, N*N);
 % step one: initial guess sigma 0
-for i= 1:N+1
-    for j = 1:N+1
+for i= 1:N*N
+    for j = 1:N*N
         sigma(i,j) = 1;
         %u = Forward(N,sigma);
         
     end
      
 end
-u_sol = Forward(N,sigma,u);
+[u_sol, residual] = Forward(N,sigma,u);
 
-% Step 4
+r0 = abs(u_sol - u);
+J = [u_sol(1), u_sol(2), 0, u_sol(4),0,0,0,0,0;
+    u_sol(1), u_sol(2), u_sol(3), 0, u_sol(5), 0,0,0,0;
+    0, u_sol(2), u_sol(3),0,0, u_sol(6), 0,0,0;
+    u_sol(1),0,0, u_sol(4), u_sol(5),0,  u_sol(7), 0,0;
+    0,u_sol(2), 0, u_sol(4), u_sol(5), u_sol(6),0,u_sol(8),0;
+    0,0,u_sol(3), 0, u_sol(5), u_sol(6), 0,0,u_sol(9);
+    0,0,0,u_sol(4), 0, 0, u_sol(7), u_sol(8), 0;
+    0,0,0,0,u_sol(5),0,  u_sol(7), u_sol(8), u_sol(9);
+    0, 0, 0, 0, 0, u_sol(6), 0, u_sol(8), u_sol(9)]
+%sigma1 = sigma +
 
-r1 = abs(u - u_sol);
-% sigma1 = sigma + ((J'J)^-1) * J'  * r0     % Need to find the Jacobian
 
-%u1 = Forward(N, sigma1, u_sol);
 
 %%
-function u = Forward(N, sigma,u)
+function [u_s, residual] = Forward(N, sigma,u)
 %laplace1(N) solves the 2D Laplace equation 
 %        u_xx + u_yy = 0 
 %    on the unit square with N dx by N dy, with dx = dy = h. 
@@ -78,21 +85,19 @@ while normresidual > EPSILON
     sum = 0;
     for i = 2:N
         for j = 2:N
-            A = -(1/2)*(4*sigma(i,j) +sigma(i+1,j)+ sigma(i-1,j)+...
-            sigma(i,j+1)+sigma(i,j-1)) *u(i,j)+sigma(i+1,j)*u(i+1,j)+...
-            sigma(i-1,j)*u(i-1,j)+sigma(i,j+1)*u(i,j+1)+sigma(i,j-1)*u(i,j-1);
-            sum = sum + abs(A);
-            u(i,j) = u(i,j) + A/((1/2)*(4*sigma(i,j) +sigma(i+1,j)+...
-            sigma(i-1,j)+ sigma(i,j+1)+sigma(i,j-1)));  
+            residual = -4*sigma(i,j)*u(i,j)+sigma(i+1,j)*u(i+1,j)+sigma(i-1,j)*u(i-1,j)+sigma(i,j+1)*u(i,j+1)+sigma(i,j-1)*u(i,j-1);
+            sum = sum + abs(residual);
+            u(i,j) = u(i,j) + residual/4;  
         end
     end
     normresidual = sum;
 end
 iterations = iter
+
 %toc
 
 %u = u'; % transpose to plot
-
+u_s = u
 % figure
 % surf(x,y,u);
 % shading flat;
@@ -111,5 +116,3 @@ iterations = iter
 % colorbar;
 
 end
-
-%function J = Jacob(A,u)
