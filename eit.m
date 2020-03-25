@@ -34,12 +34,15 @@ for i= 1:N+1
 end
 u_sol = Forward(N,sigma,u);
 
+% Step 4
 
+r1 = abs(u - u_sol);
+% sigma1 = sigma + ((J'J)^-1) * J'  * r0     % Need to find the Jacobian
 
-
+%u1 = Forward(N, sigma1, u_sol);
 
 %%
-function u_s = Forward(N, sigma,u)
+function u = Forward(N, sigma,u)
 %laplace1(N) solves the 2D Laplace equation 
 %        u_xx + u_yy = 0 
 %    on the unit square with N dx by N dy, with dx = dy = h. 
@@ -75,9 +78,12 @@ while normresidual > EPSILON
     sum = 0;
     for i = 2:N
         for j = 2:N
-            residual = -4*sigma(i,j)*u(i,j)+sigma(i+1,j)*u(i+1,j)+sigma(i-1,j)*u(i-1,j)+sigma(i,j+1)*u(i,j+1)+sigma(i,j-1)*u(i,j-1);
-            sum = sum + abs(residual);
-            u(i,j) = u(i,j) + residual/4;  
+            A = -(1/2)*(4*sigma(i,j) +sigma(i+1,j)+ sigma(i-1,j)+...
+            sigma(i,j+1)+sigma(i,j-1)) *u(i,j)+sigma(i+1,j)*u(i+1,j)+...
+            sigma(i-1,j)*u(i-1,j)+sigma(i,j+1)*u(i,j+1)+sigma(i,j-1)*u(i,j-1);
+            sum = sum + abs(A);
+            u(i,j) = u(i,j) + A/((1/2)*(4*sigma(i,j) +sigma(i+1,j)+...
+            sigma(i-1,j)+ sigma(i,j+1)+sigma(i,j-1)));  
         end
     end
     normresidual = sum;
@@ -86,7 +92,7 @@ iterations = iter
 %toc
 
 %u = u'; % transpose to plot
-u_s = u
+
 % figure
 % surf(x,y,u);
 % shading flat;
@@ -105,3 +111,5 @@ u_s = u
 % colorbar;
 
 end
+
+%function J = Jacob(A,u)
