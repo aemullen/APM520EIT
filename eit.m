@@ -24,8 +24,8 @@ u(:,N+1) = normrnd(1,0.09,N+1,1);
 
 sigma = zeros(N*N, N*N);
 % step one: initial guess sigma 0
-for i= 1:N*N
-    for j = 1:N*N
+for i= 2:N*N
+    for j = 2:N*N
         sigma(i,j) = 1;
         %u = Forward(N,sigma);
         
