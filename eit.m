@@ -46,8 +46,8 @@ J = [u_sol(1), u_sol(2), 0, u_sol(4),0,0,0,0,0;
     0, 0, 0, 0, 0, u_sol(6), 0, u_sol(8), u_sol(9)];
 sigma1 = sigma + (J'*J)^-1 *J'*r0;
 x = (k-1)/N; y = (k-1)/N;
-figure(1)
-clf
+figure
+%clf
 surf(x,y,sigma1)
 
 %%
