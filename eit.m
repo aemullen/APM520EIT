@@ -44,25 +44,27 @@ r0 = norm(u_sol - u);
 %     0,0,0,u_sol(4), 0, 0, u_sol(7), u_sol(8), 0;
 %     0,0,0,0,u_sol(5),0,  u_sol(7), u_sol(8), u_sol(9);
 %     0, 0, 0, 0, 0, u_sol(6), 0, u_sol(8), u_sol(9)]
-J = zeros(N,N);
-for i = 1:N*N
-    for j = 1:N*N
-        if BigA(i,j)==0
-            J(i,j) = 0;
-        else
-            J(i,j) = 1;
-        end
-    end
-end
+%J = zeros(N,N);
+%for i = 1:N*N
+%    for j = 1:N*N
+%        if BigA(i,j)==0
+%            J(i,j) = 0;
+%        else
+%            J(i,j) = 1;
+%        end
+%    end
+%end
+J=BigA;
 J = J.*u_sol(1:N*N)
 sigma1 = sigma + (J'*J)^-1 *J'*r0;
 
 % plot
 k = (1:N*N)';
 x = (k-1)/N; y = (k-1)/N;
-% figure
-%clf
-% surf(x,y,sigma1)
+figure
+clf
+surf(x,y,sigma1)
+xlabel=('x');ylabel=('y');zlabel=('sigma');
 
 %%
 function [u_s, residual] = Forward(N, sigma,u)
