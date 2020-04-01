@@ -25,7 +25,7 @@ for i= 1:N*N
 end
 
 %Recreates the laplace
-R=6
+R=N;
 M=ones(R,R);
 d=ones(1,R)*-4;
 d2=ones(1,R-1);
