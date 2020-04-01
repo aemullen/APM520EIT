@@ -3,7 +3,7 @@
 
 %% Inverse problem
 % Gauss Newton Method
-N = 3;
+N = 6;
 u = zeros(N+1, N+1);
 % step one: boudary conditions
 u(N+1,:) = normrnd(1,0.09,N+1,1);
@@ -21,7 +21,7 @@ for i= 2:N*N
 end
 
 %Recreates the laplace
-R=6
+R=N;
 M=ones(R,R);
 d=ones(1,R)*-4;
 d2=ones(1,R-1);
@@ -47,22 +47,22 @@ r0 = norm(u_sol - u);
 J = zeros(N,N);
 for i = 1:N*N
     for j = 1:N*N
-        if sigma(i,j)==0
+        if BigA(i,j)==0
             J(i,j) = 0;
         else
             J(i,j) = 1;
         end
     end
 end
-%J = J*u_sol
+J = J.*u_sol(1:N*N)
 sigma1 = sigma + (J'*J)^-1 *J'*r0;
 
 % plot
 k = (1:N*N)';
 x = (k-1)/N; y = (k-1)/N;
-figure
+% figure
 %clf
-surf(x,y,sigma1)
+% surf(x,y,sigma1)
 
 %%
 function [u_s, residual] = Forward(N, sigma,u)
@@ -99,3 +99,4 @@ iterations = iter;
 
 u_s = u;
 end
+
