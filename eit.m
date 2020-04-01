@@ -32,7 +32,7 @@ d2=ones(1,R-1);
 d3=ones(1,R^2-3);
 A=diag(d)+diag(d2,1)+diag(d2,-1)
 ACell = repmat({A}, 1, R);
-BigA = blkdiag(ACell{:})+diag(d3,3)+diag(d3,-3)
+BigA = blkdiag(ACell{:})+diag(d3,3)+diag(d3,-3);
 
 % step three: find voltage (u0) by solving forward problem
 [u_sol, residual] = Forward(N,sigma,u);
