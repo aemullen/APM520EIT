@@ -55,7 +55,7 @@ r0 = norm(u_sol - u);
 %    end
 %end
 J=BigA;
-J = J.*u_sol(1:N*N)
+J = J.*u_sol(1:N*N);
 sigma1 = sigma + (J'*J)^-1 *J'*r0;
 
 % plot
