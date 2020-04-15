@@ -99,8 +99,12 @@ J =[-4*u_sol(1)+u_sol(2)+u_sol(4),-u_sol(1)+u_sol(2),0,-u_sol(1)+u_sol(4),0,0,0,
      if it ==1000
          break
      end
-end      
-it       
+end 
+if it==0
+disp('loop did not run')
+else
+it  
+end
 [x,y] = meshgrid(1:N+1,1:N+1);
 figure;
 surf(x,y,reshape(sigma0,N+1,N+1))
